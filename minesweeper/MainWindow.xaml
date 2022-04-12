@@ -1,0 +1,32 @@
+﻿<Window x:Class="minesweeper.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:minesweeper"
+        mc:Ignorable="d"
+        Title="Minesweeper" Height="120" Width="300" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Background="#b9dd77">
+    <Grid x:Name="GameGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Orientation="Horizontal" x:Name="Header">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                <RadioButton x:Name="Easy" IsChecked="True" Checked="RadioButton_Checked">Easy</RadioButton>
+                <RadioButton x:Name="Medium" Checked="RadioButton_Checked">Medium</RadioButton>
+                <RadioButton x:Name="Hard" Checked="RadioButton_Checked">Hard</RadioButton>
+            </StackPanel>
+
+            <Button Content="New Game" FontSize="13" x:Name="newGameButton" Click="newGameButton_Click" Width="80" Height="30"  Margin="20 0 20 0"/>
+
+        </StackPanel>
+
+
+        <Border Grid.Row="1" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <StackPanel x:Name="GameBoardSp" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"></StackPanel>
+        </Border>
+
+    </Grid>
+</Window>
