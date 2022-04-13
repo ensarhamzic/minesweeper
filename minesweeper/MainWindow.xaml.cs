@@ -25,6 +25,7 @@ namespace minesweeper
         dif difficulty; // difficulty of current game
         dif choosenDifficulty; // difficulty of game chosen by user
         Board board; // board of current game
+        bool game; // used to check if game is running
 
         public enum dif
         {
@@ -52,12 +53,14 @@ namespace minesweeper
             choosenDifficulty = dif.easy;
             firstGame = true;
             firstTurn = true;
+            game = false;
         }
 
         private void newGameButton_Click(object sender, RoutedEventArgs e)
         {
             difficulty = choosenDifficulty;
-            if(firstGame) // if this is the first game, adds some text on the top
+            game = true;
+            if (firstGame) // if this is the first game, adds some text on the top
             {
                 TextBlock bl = new TextBlock();
                 bl.FontSize = 15;
@@ -80,7 +83,7 @@ namespace minesweeper
 
             board = new Board(difficulty);
             firstTurn = true;
-            (GameGrid.FindName("MinesCounter") as TextBlock).Text = $"Mines left: {board.Mines}";
+            (GameGrid.FindName("MinesCounter") as TextBlock).Text = $"Mines left: {board.Flags}";
             
             ShowGameBoard(difficulty);
         }
@@ -137,6 +140,7 @@ namespace minesweeper
                     RegisterName(gr.Name, gr);
 
                     gr.MouseLeftButtonDown += new MouseButtonEventHandler(FieldClick);
+                    gr.MouseRightButtonDown += new MouseButtonEventHandler(FlagClick);
 
                     gr.Children.Add(r);
                     rowSp.Children.Add(gr);
@@ -145,12 +149,58 @@ namespace minesweeper
             }
         }
 
-        private void FieldClick(object sender, MouseButtonEventArgs e)
+        private void FlagClick(object sender, MouseButtonEventArgs e)
         {
+            if (!game || firstTurn) return;
             var gr = sender as Grid;
             int index = gr.Name.IndexOf("c");
             int row = int.Parse(gr.Name.Substring(1, index - 1));
             int col = int.Parse(gr.Name.Substring(index + 1));
+            if (board.Fields[row, col].IsRevealed) return;
+            board.Fields[row, col].IsFlagged = !board.Fields[row, col].IsFlagged;
+            if (board.Fields[row, col].IsFlagged)
+            {
+                Rectangle rec = new Rectangle();
+                rec.HorizontalAlignment = HorizontalAlignment.Center;
+                rec.VerticalAlignment = VerticalAlignment.Center;
+                rec.Fill = Brushes.Red;
+                if (difficulty == dif.easy)
+                {
+                    rec.Width = 20;
+                    rec.Height = 20;
+                }
+                else if (difficulty == dif.medium)
+                {
+                    rec.Width = 16;
+                    rec.Height = 16;
+                }
+                else
+                {
+                    rec.Width = 15;
+                    rec.Height = 15;
+                }
+
+                gr.Children.Add(rec);
+                board.Flags--;
+            }
+            else
+            {
+                gr.Children.RemoveAt(gr.Children.Count - 1);
+                board.Flags++;
+            }
+            (GameGrid.FindName("MinesCounter") as TextBlock).Text = $"Mines left: {board.Flags}";
+
+        }
+
+        private void FieldClick(object sender, MouseButtonEventArgs e)
+        {
+            if (!game) return;
+            var gr = sender as Grid;
+            int index = gr.Name.IndexOf("c");
+            int row = int.Parse(gr.Name.Substring(1, index - 1));
+            int col = int.Parse(gr.Name.Substring(index + 1));
+            if (board.Fields[row, col].IsRevealed || board.Fields[row, col].IsFlagged) return;
+            
             if (firstTurn)
             {
                 board.SetMines(row, col);
@@ -160,6 +210,7 @@ namespace minesweeper
             bool isGameOver = board.MakeTurn(row, col, true); // returns true if user clicked on mine
             if(isGameOver) // clicked on mine
             {
+                game = false;
                 for (int i = 0; i < board.Rows; i++)
                 {
                     for (int j = 0; j < board.Cols; j++)
@@ -251,6 +302,11 @@ namespace minesweeper
                             tempGr.Children.Add(tb);
                         }
                     }
+                }
+                if(board.IsWin())
+                {
+                    game = false;
+                    MessageBox.Show("You won!");
                 }
             }
             

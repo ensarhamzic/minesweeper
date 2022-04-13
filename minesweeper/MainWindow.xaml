@@ -25,7 +25,10 @@
 
 
         <Border Grid.Row="1" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <StackPanel x:Name="GameBoardSp" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"></StackPanel>
+            <StackPanel x:Name="GameBoardSp" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            </StackPanel>
+
+            
         </Border>
 
     </Grid>

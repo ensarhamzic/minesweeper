@@ -12,11 +12,18 @@ namespace minesweeper
         private int rows;
         private int cols;
         private int mines;
+        private int flags;
 
         public Field[,] Fields
         {
             get { return fields; }
             set { fields = value; }
+        }
+
+        public int Flags
+        {
+            get { return flags; }
+            set { flags = value; }
         }
 
         public int Rows
@@ -44,18 +51,21 @@ namespace minesweeper
                 cols = 10;
                 rows = 8;
                 mines = 10;
+                flags = 10;
             }
             else if (difficulty == MainWindow.dif.medium)
             {
                 cols = 18;
                 rows = 14;
                 mines = 40;
+                flags = 40;
             }
             else if (difficulty == MainWindow.dif.hard)
             {
                 cols = 24;
                 rows = 20;
                 mines = 99;
+                flags = 99;
             }
             fields = new Field[rows, cols];
             for (int i = 0; i < rows; i++)
@@ -144,6 +154,18 @@ namespace minesweeper
                 }
             }
 
+            return false;
+        }
+        
+        public bool IsWin()
+        {
+            int numRevealed = 0;
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
+                    if (fields[i, j].IsRevealed)
+                        numRevealed++;
+            if (numRevealed == rows * cols - mines)
+                return true;
             return false;
         }
 
