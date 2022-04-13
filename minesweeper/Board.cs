@@ -13,6 +13,12 @@ namespace minesweeper
         private int cols;
         private int mines;
 
+        public Field[,] Fields
+        {
+            get { return fields; }
+            set { fields = value; }
+        }
+
         public int Rows
         {
             get { return rows; }
@@ -61,7 +67,7 @@ namespace minesweeper
             }
         }
 
-        public void setMines(int x, int y)
+        public void SetMines(int x, int y)
         {
             Random rnd = new Random();
             int count = 0;
@@ -78,6 +84,67 @@ namespace minesweeper
                     }
                 }
             }
+            CalculateAdjacentMines();
+        }
+
+        private void CalculateAdjacentMines()
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    if (!fields[i, j].IsMine)
+                    {
+                        int adjacentMines = 0;
+                        for (int k = i - 1; k <= i + 1; k++)
+                        {
+                            for (int l = j - 1; l <= j + 1; l++)
+                            {
+                                if (k >= 0 && k < rows && l >= 0 && l < cols)
+                                {
+                                    if (fields[k, l].IsMine)
+                                    {
+                                        adjacentMines++;
+                                    }
+                                }
+                            }
+                        }
+                        fields[i, j].AdjacentMines = adjacentMines;
+                    }
+                }
+            }
+
+        }
+
+
+        public bool MakeTurn(int x, int y, bool first)
+        {
+            // first = true if user clicked on x,y field
+            if(first && fields[x,y].IsMine)
+            {
+                return true;
+            }
+            else if (!fields[x, y].IsMine)
+            {
+                fields[x, y].IsRevealed = true;
+                if(fields[x, y].AdjacentMines == 0)
+                { 
+                    for (int i = x - 1; i <= x + 1; i++)
+                    {
+                        for (int j = y - 1; j <= y + 1; j++)
+                        {
+                            if (i >= 0 && i < rows && j >= 0 && j < cols
+                                && !fields[i, j].IsRevealed
+                                && !fields[i, j].IsFlagged)
+                            {
+                                MakeTurn(i, j, false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
     }

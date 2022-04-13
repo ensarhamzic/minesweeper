@@ -10,9 +10,9 @@ namespace minesweeper
     {
         bool isMine;
         bool isRevealed;
+        bool isFlagged;
         int adjacentMines;
 
-        bool isChecked; // Used to prevent double-checking a field when checking for adjacent mines
 
         public int AdjacentMines
         {
@@ -32,10 +32,11 @@ namespace minesweeper
             set { isRevealed = value; }
         }
 
-        public bool IsChecked
+
+        public bool IsFlagged
         {
-            get { return isChecked; }
-            set { isChecked = value; }
+            get { return isFlagged; }
+            set { isFlagged = value; }
         }
 
         public Field()
@@ -43,7 +44,7 @@ namespace minesweeper
             isMine = false;
             isRevealed = false;
             adjacentMines = 0;
-            isChecked = false;
+            isFlagged = false;
         }
     }
 }
