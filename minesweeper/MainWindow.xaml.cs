@@ -5,12 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Timers;
 
@@ -246,7 +242,7 @@ namespace minesweeper
                         if (board.Fields[i, j].IsMine)
                         {
                             Grid tempGr = (FindName($"r{i}c{j}") as Grid);
-                            this.Dispatcher.Invoke(() =>
+                            Dispatcher.Invoke(() =>
                             {
                                 (tempGr.Children[0] as Rectangle).Fill = gameOverColor;
                             });
@@ -280,7 +276,7 @@ namespace minesweeper
                         {
                             Grid tempGr = (FindName($"r{i}c{j}") as Grid);
                             tempGr.Children.RemoveRange(1, tempGr.Children.Count - 1); // removes previous and adds new again (for better performance)
-                            this.Dispatcher.Invoke(() =>
+                            Dispatcher.Invoke(() =>
                             {
                                 if ((i % 2 == 0 && j % 2 == 0) || (i % 2 != 0 && j % 2 != 0))
                                     (tempGr.Children[0] as Rectangle).Fill = revealedColor1;
