@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Timers;
 
 namespace minesweeper
 {
@@ -26,6 +27,8 @@ namespace minesweeper
         dif choosenDifficulty; // difficulty of game chosen by user
         Board board; // board of current game
         bool game; // used to check if game is running
+        int time;
+        Timer timer;
 
         public enum dif
         {
@@ -54,10 +57,33 @@ namespace minesweeper
             firstGame = true;
             firstTurn = true;
             game = false;
+            time = 0;
+            timer = new Timer(1000);
+            timer.Elapsed += SecondElapsed;
+            timer.Enabled = false;
+            timer.AutoReset = true;
+        }
+
+        private void SecondElapsed(object sender, ElapsedEventArgs e)
+        {
+            time++;
+            string timeText = TimeConvert(time);
+            
+            Dispatcher.Invoke(() =>
+            {
+                (GameGrid.FindName("TimeCounter") as TextBlock).Text = timeText;
+            });
         }
 
         private void newGameButton_Click(object sender, RoutedEventArgs e)
         {
+            time = 0;
+            timer.Enabled = false;
+            Dispatcher.Invoke(() =>
+            {
+                if(GameGrid.FindName("TimeCounter") != null)
+                    (GameGrid.FindName("TimeCounter") as TextBlock).Text = "Time: 00s";
+            });
             difficulty = choosenDifficulty;
             game = true;
             if (firstGame) // if this is the first game, adds some text on the top
@@ -72,7 +98,7 @@ namespace minesweeper
 
                 TextBlock tl = new TextBlock();
                 tl.FontSize = 15;
-                tl.Text = "Time: 0";
+                tl.Text = "Time: 00s";
                 tl.VerticalAlignment = VerticalAlignment.Center;
                 tl.FontWeight = FontWeights.Bold;
                 tl.Margin = new Thickness(30, 0, 0, 0);
@@ -204,12 +230,14 @@ namespace minesweeper
             if (firstTurn)
             {
                 board.SetMines(row, col);
+                timer.Enabled = true;
                 firstTurn = false;
             }
 
             bool isGameOver = board.MakeTurn(row, col, true); // returns true if user clicked on mine
             if(isGameOver) // clicked on mine
             {
+                timer.Enabled = false;
                 game = false;
                 for (int i = 0; i < board.Rows; i++)
                 {
@@ -305,8 +333,9 @@ namespace minesweeper
                 }
                 if(board.IsWin())
                 {
+                    timer.Enabled = false;
                     game = false;
-                    MessageBox.Show("You won!");
+                    MessageBox.Show($"You won! Your time: {TimeConvert(time)}");
                 }
             }
             
@@ -323,6 +352,47 @@ namespace minesweeper
                 choosenDifficulty = dif.medium;
             else if (checkedBtn.Name == "Hard")
                 choosenDifficulty = dif.hard;
+        }
+
+        private string TimeConvert(int time)
+        {
+            int hours = time / 3600;
+            int minutes = (time % 3600) / 60;
+            int seconds = (time % 3600) % 60;
+            string timeText = "Time: ";
+            if (hours > 0)
+            {
+                if (hours > 9)
+                {
+                    timeText += $"{hours}h ";
+                }
+                else
+                {
+                    timeText += $"0{hours}h ";
+                }
+            }
+            if (minutes > 0 || (minutes == 0 && hours > 0))
+            {
+                if (minutes > 9)
+                {
+                    timeText += $"{minutes}m ";
+                }
+                else
+                {
+                    timeText += $"0{minutes}m ";
+                }
+            }
+
+            if (seconds > 9)
+            {
+                timeText += $"{ seconds }s ";
+            }
+            else
+            {
+                timeText += $"0{ seconds }s ";
+            }
+
+            return timeText;
         }
     }
 }
